@@ -1,0 +1,33 @@
+{
+  "name": "opencode-claude-setup",
+  "version": "1.0.0",
+  "description": "Interactive installer that configures OpenCode to behave like Claude Code: subagents, skills, plugins, MCP servers, and a memory-file convention",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "opencode-claude-setup": "bin/install.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "templates",
+    "docs",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "claude-code",
+    "installer",
+    "setup"
+  ],
+  "homepage": "https://github.com/ahmadmcer/opencode-claude-setup",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmadmcer/opencode-claude-setup.git"
+  }
+}
