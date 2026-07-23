@@ -2,9 +2,14 @@ import { shellExec, shellExecInherit } from "./shellExec.mjs";
 
 export function runNpmInstall(targetDir) {
   console.log("\nRunning npm install (this may take a moment)...");
-  // --prefix rather than process.chdir, so the installer's own cwd is never mutated.
+  // cwd (not process.chdir, and not a --prefix argument) so the installer's
+  // own cwd is never mutated, and the user-supplied targetDir never ends up
+  // concatenated into the shell:true command string -- passing it as an
+  // argument (rather than the cwd option, which isn't part of that string)
+  // both breaks on paths containing spaces and is flagged by Node's DEP0190
+  // as an unescaped-shell-argument risk.
   // stdio inherited (not captured) so a multi-second install doesn't look hung.
-  shellExecInherit("npm", ["install", "--prefix", targetDir]);
+  shellExecInherit("npm", ["install"], { cwd: targetDir });
 }
 
 // Non-fatal either way -- by the time this runs, every file is already on

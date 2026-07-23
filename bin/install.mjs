@@ -213,6 +213,15 @@ async function main() {
 
   // --- verification ---
   verifyConfig(targetDir, answers);
+  if (answers.githubToken) {
+    console.log(
+      "\nNote: since GITHUB_TOKEN isn't set in this terminal's environment yet, the github"
+    );
+    console.log(
+      "server below will likely show as failed to connect -- that's expected, not a problem."
+    );
+    console.log("It'll connect once you set the variable (see below) and open a new terminal.");
+  }
   listMcpStatus(targetDir);
 
   // --- final reminders ---
