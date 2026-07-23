@@ -13,6 +13,7 @@ import { defaultTargetDir, resolveTargetDir } from "../src/paths.mjs";
 import { buildOpencodeConfig, buildTuiConfig, buildPackageJson, toFileContent } from "../src/render.mjs";
 import { copyFile } from "../src/copyStatic.mjs";
 import { runNpmInstall, verifyConfig, listMcpStatus } from "../src/verify.mjs";
+import { persistGithubToken } from "../src/tokenPersist.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.join(__dirname, "..");
@@ -65,6 +66,18 @@ async function main() {
   console.log("It is never written to any generated file; only referenced as {env:GITHUB_TOKEN}.");
   const githubToken = await promptText(prompter, "GitHub personal access token");
   answers.githubToken = githubToken || null;
+
+  answers.persistToken = false;
+  if (answers.githubToken) {
+    console.log(
+      process.platform === "win32"
+        ? "\nThis can set it as a persistent User environment variable via `setx` now,"
+        : "\nThis can append it to your shell profile (~/.bashrc, ~/.zshrc, or ~/.profile) now,"
+    );
+    console.log("so you don't have to run a command yourself. Declining just prints the");
+    console.log("command instead and changes nothing on your system.");
+    answers.persistToken = await promptYesNo(prompter, "Persist GITHUB_TOKEN now?", true);
+  }
 
   // --- model / small_model, validated live ---
   console.log("\nFetching available models (opencode models)...");
@@ -119,6 +132,9 @@ async function main() {
   console.log(`Plugins          : ${[...answers.plugins].join(", ") || "(none)"}`);
   console.log(`MCP servers      : ${[...answers.mcp].join(", ") || "(none)"}`);
   console.log(`GitHub token     : ${answers.githubToken ? "given" : "not given"}`);
+  if (answers.githubToken) {
+    console.log(`Persist token    : ${answers.persistToken ? "yes, automatically" : "no, print the command instead"}`);
+  }
 
   const proceed = await promptYesNo(prompter, "\nProceed and write these files?", true);
   rl.close();
@@ -211,16 +227,23 @@ async function main() {
     console.log("\nNo plugins selected -- skipping npm install (nothing to install).");
   }
 
+  // --- persist GITHUB_TOKEN, if the user opted in (deferred until after the
+  // Proceed? gate, same as every other side effect in this script) ---
+  let persistResult = null;
+  if (answers.githubToken && answers.persistToken) {
+    persistResult = persistGithubToken(answers.githubToken);
+  }
+
   // --- verification ---
   verifyConfig(targetDir, answers);
   if (answers.githubToken) {
     console.log(
-      "\nNote: since GITHUB_TOKEN isn't set in this terminal's environment yet, the github"
+      "\nNote: even if GITHUB_TOKEN was just persisted, it isn't set in THIS terminal's"
     );
     console.log(
-      "server below will likely show as failed to connect -- that's expected, not a problem."
+      "environment yet -- the github server below will likely show as failed to connect."
     );
-    console.log("It'll connect once you set the variable (see below) and open a new terminal.");
+    console.log("That's expected, not a problem. It'll connect once you open a new terminal.");
   }
   listMcpStatus(targetDir);
 
@@ -234,13 +257,21 @@ async function main() {
   }
 
   if (answers.githubToken) {
-    console.log("\nSet GITHUB_TOKEN yourself (never run automatically by this installer):");
-    if (process.platform === "win32") {
-      console.log(`  [Environment]::SetEnvironmentVariable("GITHUB_TOKEN", "${answers.githubToken}", "User")`);
-      console.log("  (run in PowerShell, then open a NEW terminal for it to take effect)");
+    if (persistResult?.ok) {
+      console.log(`\nGITHUB_TOKEN persisted (${persistResult.detail}).`);
+      console.log("Open a NEW terminal for it to take effect.");
     } else {
-      console.log(`  export GITHUB_TOKEN="${answers.githubToken}"`);
-      console.log("  (add this line to ~/.bashrc / ~/.zshrc / ~/.profile to persist it)");
+      if (persistResult && !persistResult.ok) {
+        console.log(`\nCould not persist GITHUB_TOKEN automatically (${persistResult.error}).`);
+      }
+      console.log("\nSet GITHUB_TOKEN yourself:");
+      if (process.platform === "win32") {
+        console.log(`  [Environment]::SetEnvironmentVariable("GITHUB_TOKEN", "${answers.githubToken}", "User")`);
+        console.log("  (run in PowerShell, then open a NEW terminal for it to take effect)");
+      } else {
+        console.log(`  export GITHUB_TOKEN="${answers.githubToken}"`);
+        console.log("  (add this line to ~/.bashrc / ~/.zshrc / ~/.profile to persist it)");
+      }
     }
   }
 

@@ -33,10 +33,11 @@ Full details, including every gotcha that shaped these choices, are in
 - **Never writes your GitHub token to disk.** If you give one, it's only
   referenced in the generated config as `{env:GITHUB_TOKEN}`; the raw value
   is never persisted anywhere by this tool.
-- **Never touches your shell profile or the registry.** If you provide a
-  token, the installer prints the exact command to persist it yourself
-  (`setx`/PowerShell on Windows, `export` on macOS/Linux) -- it does not run
-  that command or edit any file on your behalf.
+- **Never touches your shell profile or the registry without asking first.**
+  If you provide a token, you're asked separately whether to persist it
+  automatically (`setx` on Windows, appending to your shell profile on
+  macOS/Linux) or have the exact command printed for you to run yourself
+  instead. Declining changes nothing on your system.
 - **Doesn't phone home.** Everything happens locally against your own
   filesystem and your own `opencode` CLI.
 
@@ -50,11 +51,12 @@ Full details, including every gotcha that shaped these choices, are in
 
 1. Confirm or override the target directory (defaults to `~/.config/opencode`)
 2. GitHub personal access token (optional -- blank skips the GitHub MCP server)
-3. Default model and small model, each validated live against `opencode models`
-4. TUI theme name (no live validation exists for this one)
-5. Which plugins to include (all on by default)
-6. Which MCP servers to include (all on by default, minus GitHub if no token was given)
-7. A final recap and yes/no confirmation -- **nothing is written to disk before this point**
+3. If a token was given: whether to persist it automatically or just print the command
+4. Default model and small model, each validated live against `opencode models`
+5. TUI theme name (no live validation exists for this one)
+6. Which plugins to include (all on by default)
+7. Which MCP servers to include (all on by default, minus GitHub if no token was given)
+8. A final recap and yes/no confirmation -- **nothing is written to disk, and no environment variable is touched, before this point**
 
 After that: files are written (with backups as needed), `npm install` runs
 if any plugin needing dependencies was selected, then `opencode debug config`
