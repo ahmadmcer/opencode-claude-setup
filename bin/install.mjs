@@ -90,10 +90,12 @@ async function main() {
     rl.close();
     process.exit(1);
   }
-  const modelValidator = (v) =>
-    models.includes(v)
-      ? { ok: true }
-      : { ok: false, message: `Not a known model id. First few available: ${models.slice(0, 8).join(", ")}` };
+  const modelValidator = (v) => {
+    if (models.includes(v)) return { ok: true };
+    console.log(`  (warning: "${v}" is not in the \`opencode models\` list for your current subscription —`);
+    console.log(`   continuing anyway. Verify with \`opencode debug config\` after install.)`);
+    return { ok: true };
+  };
 
   answers.model = await promptText(prompter, "\nDefault model (provider/model)", {
     default: models.includes("opencode/deepseek-v4-flash-free") ? "opencode/deepseek-v4-flash-free" : models[0],
