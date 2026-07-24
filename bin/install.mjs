@@ -24,6 +24,7 @@ const PLUGIN_UNITS = [
   { id: "auto-lint", label: "auto-lint", desc: "Runs the project's linter after every edit/write" },
   { id: "checkpoint", label: "checkpoint", desc: "Lets the agent bookmark/recall named points in a session" },
   { id: "token-usage", label: "token-usage", desc: "Sidebar panel showing per-session token usage and cost (server + TUI pair)" },
+  { id: "go-usage", label: "go-usage", desc: "Sidebar panel showing OpenCode Go usage limits (TUI only)" },
 ];
 
 const MCP_UNITS = [
@@ -207,6 +208,7 @@ async function main() {
     "auto-lint": ["auto-lint.ts"],
     checkpoint: ["checkpoint.ts"],
     "token-usage": ["token-usage-server.ts", "token-usage-tui.ts"],
+    "go-usage": ["go-usage-tui.ts"],
   };
   for (const id of answers.plugins) {
     for (const file of pluginFiles[id]) {

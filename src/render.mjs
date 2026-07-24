@@ -152,7 +152,10 @@ export function buildTuiConfig(answers) {
   // Hardcoded literal forward slash -- this string is consumed by opencode's
   // own resolver, not Node's fs. Never run through path.join/path.resolve,
   // which would emit backslashes on Windows and could break the import.
-  const plugin = answers.plugins.has("token-usage") ? ["./plugins/token-usage-tui.ts"] : [];
+  const plugin = [
+    ...(answers.plugins.has("token-usage") ? ["./plugins/token-usage-tui.ts"] : []),
+    ...(answers.plugins.has("go-usage") ? ["./plugins/go-usage-tui.ts"] : []),
+  ];
 
   return {
     $schema: "https://opencode.ai/tui.json",
@@ -190,7 +193,7 @@ export function buildPackageJson(answers) {
   // whose peer dependency on @opentui/solid has since moved to >=0.4.5,
   // producing an ERESOLVE conflict against the pinned 0.2.6 below.
   const dependencies = { "@opencode-ai/plugin": "1.14.48" };
-  if (answers.plugins.has("token-usage")) {
+  if (answers.plugins.has("token-usage") || answers.plugins.has("go-usage")) {
     dependencies["@opentui/core"] = "0.2.6";
     dependencies["@opentui/keymap"] = "0.2.6";
     dependencies["@opentui/solid"] = "0.2.6";

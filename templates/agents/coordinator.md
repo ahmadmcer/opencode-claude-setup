@@ -32,7 +32,7 @@ Use me for complex multi-component tasks that benefit from parallel agent coordi
 Your agents include:
 - build: Implementation specialist
 - plan: Analysis and planning specialist
-- code-reviewer: Quality assurance
+- review: Quality assurance
 - debug: Bug investigation
 - security-audit: Security scanning
 - docs: Documentation specialist

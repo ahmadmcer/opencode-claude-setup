@@ -12,6 +12,7 @@
 2. Plan the approach first
 3. Run tests after changes to verify nothing is broken
 4. Use conventional commits format: `type(scope): description`
+5. **Git messages: never break lines manually.** Let the body text flow naturally at paragraph width. Do not insert hard line breaks mid-sentence or mid-paragraph — only blank lines between sections.
 
 ## Security
 - Never commit secrets, API keys, or credentials

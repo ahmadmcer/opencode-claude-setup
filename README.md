@@ -19,7 +19,7 @@ directly. Requires Node.js >= 18 and the `opencode` CLI already on `PATH`
 
 - 6 markdown-defined subagents (`review`, `security-audit`, `explore`, `docs`, `debug`, `coordinator`)
 - 4 skills (`code-review`, `dependency-audit`, `security-review`, `git-release`)
-- Up to 4 optional plugins (`notification`, `auto-lint`, `checkpoint`, `token-usage`)
+- Up to 5 optional plugins (`notification`, `auto-lint`, `checkpoint`, `token-usage`, `go-usage`)
 - Up to 4 optional MCP servers (`github`, `context7`, `sequential-thinking`, `playwright`)
 - A memory-file convention (`AGENTS.md` + an empty `memory/` directory + `MEMORY.md` index)
 
